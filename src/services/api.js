@@ -6,7 +6,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || `http://localhost:${im
 export const api = {
     async triggerEmailProcess() {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/trigger-process`, {
+            const response = await fetch(`${API_BASE_URL}/trigger-process`, {
                 method: 'POST'
             })
             return await response.json()
@@ -18,7 +18,7 @@ export const api = {
 
     async checkHealth() {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/health`)
+            const response = await fetch(`${API_BASE_URL}/health`)
             return await response.json()
         } catch (error) {
             console.error('Failed to check server health:', error)
