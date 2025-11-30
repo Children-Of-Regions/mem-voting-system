@@ -118,7 +118,7 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ### Քայլ 1: Նախագիծը Ներբեռնել
 
 ```bash
-git clone https://github.com/your-repo/mem-voting-system.git
+git clone https://github.com/Children-Of-Regions/mem-voting-system.git
 cd mem-voting-system
 ```
 
@@ -177,7 +177,7 @@ npm run start
 ### Քայլ 1: Նախագիծը Ներբեռնել Սերվեր
 
 ```bash
-git clone https://github.com/your-repo/mem-voting-system.git .
+git clone https://github.com/Children-Of-Regions/mem-voting-system.git .
 ```
 
 ### Քայլ 3: Արտադրական Միջավայրի Փոփոխականներ
