@@ -37,13 +37,6 @@ export default function AdminLogin() {
         <div className="min-h-screen bg-fade-50 flex items-center justify-center px-4">
             <Toaster position="top-center" />
             <div className="max-w-md w-full fade-in">
-                <div className="text-center mb-8">
-                    <h1 className="text-5xl text-brand-500 mb-2 font-bold">
-                        Ադմինիստրատոր
-                    </h1>
-                    <p className="text-fade-600">Մուտք գործեք համակարգ</p>
-                </div>
-
                 <div className="card">
                     <form onSubmit={handleLogin} className="space-y-4">
                         <div>
