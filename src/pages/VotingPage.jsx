@@ -267,7 +267,7 @@ export default function VotingPage() {
                                         }`}
                                 >
                                     {/* Rank Badge */}
-                                    <div className={`absolute top-2 left-2 z-10 w-10 h-10 rounded-full flex items-center justify-center font-bold shadow-md text-lg ${isWinner ? 'bg-yellow-400 text-white' : 'bg-primary text-white'
+                                    <div className={`absolute top-2 left-2 z-10 w-10 h-10 rounded-full flex items-center justify-center font-bold shadow-md text-lg ${isWinner ? 'bg-yellow-400 text-white' : 'bg-brand-500 text-white'
                                         }`}>
                                         {index + 1}
                                     </div>
@@ -284,7 +284,7 @@ export default function VotingPage() {
                                         </div>
                                     )}
 
-                                    <h3 className="text-2xl font-semibold text-primary mb-2">
+                                    <h3 className="text-2xl font-semibold text-brand-500 mb-2">
                                         {nominee.name}
                                     </h3>
                                     {nominee.description && (
@@ -300,7 +300,7 @@ export default function VotingPage() {
                                         </div>
                                         <div className="w-full bg-gray-200 rounded-full h-3">
                                             <div
-                                                className="bg-primary h-3 rounded-full transition-all duration-500"
+                                                className="bg-brand-500 h-3 rounded-full transition-all duration-500"
                                                 style={{ width: `${percentage}%` }}
                                             />
                                         </div>
@@ -443,7 +443,7 @@ export default function VotingPage() {
                         alt="Logo"
                         className="mx-auto mb-6 w-64 sm:w-72 md:w-80 lg:w-96 h-auto"
                     />
-                    <h1 className="text-5xl md:text-6xl text-primary mb-4 font-semibold">
+                    <h1 className="text-5xl md:text-6xl text-brand-500 mb-4 font-semibold">
                         {session?.title}
                     </h1>
                 </div>
@@ -465,7 +465,7 @@ export default function VotingPage() {
                                     />
                                 </div>
                             )}
-                            <h3 className="text-2xl font-semibold text-primary mb-2">
+                            <h3 className="text-2xl font-semibold text-brand-500 mb-2">
                                 {nominee.name}
                             </h3>
                             {nominee.description && (
@@ -473,7 +473,7 @@ export default function VotingPage() {
                             )}
                             {selectedNominee === nominee.id && (
                                 <div className="mt-4 flex items-center justify-center">
-                                    <svg className="w-6 h-6 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                                    <svg className="w-6 h-6 text-brand-500" fill="currentColor" viewBox="0 0 20 20">
                                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                     </svg>
                                 </div>

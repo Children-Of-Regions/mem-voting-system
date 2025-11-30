@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const nodemailer = require('nodemailer');
 const { createClient } = require('@supabase/supabase-js');
-const { EMAIL_BATCH_SIZE, EMAIL_RATE_LIMIT_MS, DEFAULT_PORT, HOURLY_CHECK_INTERVAL, STARTUP_DELAY } = require('./constants');
+const { EMAIL_BATCH_SIZE, EMAIL_RATE_LIMIT_MS, DEFAULT_PORT, HOURLY_CHECK_INTERVAL, VOTING_CLOSE_CHECK_INTERVAL, STARTUP_DELAY } = require('./constants');
 
 const app = express();
 app.use(cors());
@@ -206,6 +206,30 @@ async function sendEmail(email, code) {
     await transporter.sendMail(mailOptions);
 }
 
+// Auto-close voting if closing_time has passed
+async function checkAndCloseVoting() {
+    try {
+        const { error } = await supabase.rpc('auto_close_voting_by_time');
+
+        if (error) {
+            console.error('❌ Error checking voting close time:', error);
+        } else {
+            // Check if voting was actually closed
+            const { data: config } = await supabase
+                .from('voting_config')
+                .select('status, closing_time')
+                .eq('id', 1)
+                .single();
+
+            if (config && config.status === 'closed' && config.closing_time) {
+                console.log('✅ Voting automatically closed at scheduled time:', config.closing_time);
+            }
+        }
+    } catch (error) {
+        console.error('❌ Error in checkAndCloseVoting:', error);
+    }
+}
+
 // Trigger Endpoint
 app.post('/api/trigger-process', (req, res) => {
     console.log('🔔 Manual trigger received');
@@ -228,11 +252,19 @@ app.listen(PORT, () => {
     console.log(`📊 Health check: http://localhost:${PORT}/api/health\n`);
 
     // Run on startup
-    setTimeout(() => processPendingEmails(), STARTUP_DELAY);
+    setTimeout(() => {
+        processPendingEmails();
+        checkAndCloseVoting();
+    }, STARTUP_DELAY);
 
-    // Cron Job: Run every 1 hour (60 * 60 * 1000 ms)
+    // Email Processing: Run every 1 hour
     setInterval(() => {
-        console.log('\n⏰ Running hourly check...');
+        console.log('\n📧 Running hourly email check...');
         processPendingEmails();
     }, HOURLY_CHECK_INTERVAL);
+
+    // Voting Close Check: Run every 1 minute
+    setInterval(() => {
+        checkAndCloseVoting();
+    }, VOTING_CLOSE_CHECK_INTERVAL);
 });

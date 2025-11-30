@@ -23,6 +23,7 @@ CREATE TABLE voting_config (
     id SERIAL PRIMARY KEY,
     status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'closed')),
     results_public BOOLEAN NOT NULL DEFAULT false,
+    closing_time TIMESTAMP WITH TIME ZONE,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
 
@@ -219,7 +220,62 @@ CREATE POLICY "Authenticated Delete" ON storage.objects
     USING (bucket_id = 'nominee-images');
 
 -- ============================================
+-- 6. TRIGGERS
+-- ============================================
+
+-- Auto-close voting when results are published
+CREATE OR REPLACE FUNCTION auto_close_voting_on_results_public()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    -- If results are being made public, automatically close voting
+    IF NEW.results_public = true AND OLD.results_public = false THEN
+        NEW.status = 'closed';
+    END IF;
+    
+    -- Prevent reopening voting while results are public
+    IF NEW.status = 'active' AND NEW.results_public = true THEN
+        RAISE EXCEPTION 'Cannot activate voting while results are public. Hide results first.';
+    END IF;
+    
+    RETURN NEW;
+END;
+$$;
+
+-- Create the trigger
+CREATE TRIGGER trigger_auto_close_voting
+    BEFORE UPDATE ON voting_config
+    FOR EACH ROW
+    EXECUTE FUNCTION auto_close_voting_on_results_public();
+
+-- Auto-close voting by scheduled time
+CREATE OR REPLACE FUNCTION auto_close_voting_by_time()
+RETURNS void
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    -- Close voting if closing_time has passed and voting is still active
+    UPDATE voting_config
+    SET status = 'closed',
+        updated_at = NOW()
+    WHERE id = 1
+        AND status = 'active'
+        AND closing_time IS NOT NULL
+        AND closing_time <= NOW();
+END;
+$$;
+
+
+-- Note: Validation removed - frontend handles timezone conversion correctly
+-- The auto_close_voting_by_time() function compares UTC times properly
+
+
+-- ============================================
 -- SETUP COMPLETE
 -- ============================================
 -- Email status is now part of voting_codes table
 -- No separate email_logs table needed!
+-- Voting is automatically closed when results are published (enforced by trigger)
+-- Voting can be scheduled to close at a specific time (closing_time field)
+-- Call auto_close_voting_by_time() periodically to check and close voting

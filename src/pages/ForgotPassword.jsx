@@ -62,7 +62,7 @@ export default function ForgotPassword() {
         <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
             <div className="max-w-md w-full fade-in">
                 <div className="text-center mb-8">
-                    <h1 className="text-4xl text-primary mb-2 font-semibold">
+                    <h1 className="text-4xl text-brand-500 mb-2 font-semibold">
                         Մոռացե՞լ եք գաղտնաբառը
                     </h1>
                     <p className="text-gray-600">
@@ -107,7 +107,7 @@ export default function ForgotPassword() {
                 <div className="text-center mt-6">
                     <button
                         onClick={() => navigate('/admin')}
-                        className="text-primary hover:text-primary-dark text-sm"
+                        className="text-brand-500 hover:text-brand-600 text-sm"
                     >
                         ← Վերադառնալ մուտք
                     </button>

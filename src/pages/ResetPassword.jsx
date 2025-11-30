@@ -95,7 +95,7 @@ export default function ResetPassword() {
         <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
             <div className="max-w-md w-full fade-in">
                 <div className="text-center mb-8">
-                    <h1 className="text-4xl text-primary mb-2 font-semibold">
+                    <h1 className="text-4xl text-brand-500 mb-2 font-semibold">
                         Նոր գաղտնաբառ
                     </h1>
                     <p className="text-gray-600">

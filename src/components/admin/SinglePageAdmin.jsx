@@ -355,16 +355,30 @@ export default function SinglePageAdmin() {
     async function toggleResultsVisibility() {
         const newVisibility = !config.results_public
 
+        // If making results public, also close voting
+        const updates = {
+            results_public: newVisibility,
+            updated_at: new Date().toISOString()
+        }
+
+        if (newVisibility) {
+            updates.status = 'closed'
+        }
+
         const { error } = await supabase
             .from('voting_config')
-            .update({ results_public: newVisibility, updated_at: new Date().toISOString() })
+            .update(updates)
             .eq('id', 1)
 
         if (error) {
             toast.error('Սխալ')
         } else {
-            setConfig({ ...config, results_public: newVisibility })
-            toast.success(`Արդյունքները ${newVisibility ? 'հրապարակային' : 'գաղտնի'} են`)
+            setConfig({ ...config, ...updates })
+            if (newVisibility) {
+                toast.success('Արդյունքները հրապարակված են և քվեարկությունը փակված է')
+            } else {
+                toast.success('Արդյունքները թաքցված են')
+            }
         }
     }
 
@@ -744,14 +758,31 @@ export default function SinglePageAdmin() {
                                 <label className="block text-sm font-medium text-fade-700">
                                     Բեռնել էլ․ հասցեների ցուցակ (TXT/CSV)
                                 </label>
+
+                                {/* Hidden Input */}
                                 <input
                                     id="email-file-input"
                                     type="file"
                                     accept=".txt,.csv"
                                     onChange={(e) => setEmailFile(e.target.files[0])}
-                                    className="block w-full text-sm text-fade-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand-500 file:text-fade-white hover:file:bg-brand-600"
+                                    className="hidden"
                                     disabled={uploadingEmails}
                                 />
+
+                                {/* Custom UI */}
+                                <div className="flex items-center gap-4">
+                                    <button
+                                        onClick={() => document.getElementById('email-file-input').click()}
+                                        className="px-4 py-2 rounded-full bg-brand-500 text-white text-sm font-semibold hover:bg-brand-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        disabled={uploadingEmails}
+                                    >
+                                        Ընտրել ֆայլ
+                                    </button>
+                                    <span className="text-sm text-fade-500 truncate flex-1">
+                                        {emailFile ? emailFile.name : 'Ֆայլ ընտրված չէ'}
+                                    </span>
+                                </div>
+
                                 <p className="text-xs text-fade-500">
                                     Ֆայլը պետք է պարունակի էլ․ հասցեներ՝ առանձնացված նոր տողով կամ ստորակետով։
                                 </p>
@@ -931,10 +962,19 @@ export default function SinglePageAdmin() {
                         <div className="flex items-center justify-between py-3 border-b border-red-200">
                             <div>
                                 <h3 className="text-base font-semibold text-text-dark">Քվեարկության կարգավիճակ</h3>
-                                <p className="text-sm text-fade-600">Փակել կամ բացել քվվեարկությունը</p>
+                                <p className="text-sm text-fade-600">
+                                    {config.results_public
+                                        ? '⚠️ Նախ թաքցրեք արդյունքները'
+                                        : 'Փակել կամ բացել քվեարկությունը'
+                                    }
+                                </p>
                             </div>
                             <button
                                 onClick={() => {
+                                    if (config.results_public) {
+                                        toast.error('Նախ թաքցրեք արդյունքները, որպեսզի կարողանաք բացել քվեարկությունը')
+                                        return
+                                    }
                                     const newStatus = config.status === 'active' ? 'closed' : 'active'
                                     supabase
                                         .from('voting_config')
@@ -949,7 +989,12 @@ export default function SinglePageAdmin() {
                                             }
                                         })
                                 }}
-                                style={{ backgroundColor: 'rgb(220 38 38 / 19%)', color: 'rgb(220 38 38)' }}
+                                disabled={config.results_public}
+                                style={{
+                                    backgroundColor: config.results_public ? 'rgb(156 163 175 / 30%)' : 'rgb(220 38 38 / 19%)',
+                                    color: config.results_public ? 'rgb(107 114 128)' : 'rgb(220 38 38)',
+                                    cursor: config.results_public ? 'not-allowed' : 'pointer'
+                                }}
                                 className="px-4 py-2 rounded-lg font-semibold transition-colors hover:opacity-80"
                             >
                                 {config.status === 'active' ? 'Փակել' : 'Ակտիվացնել'}
@@ -963,26 +1008,138 @@ export default function SinglePageAdmin() {
                                 <p className="text-sm text-fade-600">Հրապարակել կամ թաքցնել արդյունքները</p>
                             </div>
                             <button
-                                onClick={() => {
+                                onClick={async () => {
                                     const newVisibility = !config.results_public
-                                    supabase
+
+                                    const { error } = await supabase
                                         .from('voting_config')
                                         .update({ results_public: newVisibility, updated_at: new Date().toISOString() })
                                         .eq('id', 1)
-                                        .then(({ error }) => {
-                                            if (error) {
-                                                toast.error('Սխալ')
+
+                                    if (error) {
+                                        toast.error('Սխալ')
+                                    } else {
+                                        // Fetch the updated config to get the auto-closed status
+                                        const { data: updatedConfig } = await supabase
+                                            .from('voting_config')
+                                            .select('*')
+                                            .eq('id', 1)
+                                            .single()
+
+                                        if (updatedConfig) {
+                                            setConfig(updatedConfig)
+                                            if (newVisibility) {
+                                                toast.success('Արդյունքները հրապարակված են և քվեարկությունը փակված է')
                                             } else {
-                                                setConfig({ ...config, results_public: newVisibility })
-                                                toast.success(`Արդյունքները ${newVisibility ? 'հրապարակային' : 'գաղտնի'} են`)
+                                                toast.success('Արդյունքները թաքցված են')
                                             }
-                                        })
+                                        }
+                                    }
                                 }}
                                 style={{ backgroundColor: 'rgb(220 38 38 / 19%)', color: 'rgb(220 38 38)' }}
                                 className="px-4 py-2 rounded-lg font-semibold transition-colors hover:opacity-80"
                             >
                                 {config.results_public ? 'Թաքցնել' : 'Հրապարակել'}
                             </button>
+                        </div>
+
+                        {/* Scheduled Closing Time */}
+                        <div className="flex items-center justify-between py-3 border-b border-red-200">
+                            <div className="flex-1">
+                                <h3 className="text-base font-semibold text-text-dark">Ավտոմատ փակում</h3>
+                                <p className="text-sm text-fade-600 mb-2">Նշեք ամսաթիվ և ժամ՝ քվեարկությունը ավտոմատ փակելու համար</p>
+                                {config.closing_time && (
+                                    <p className="text-xs text-brand-500 font-medium">
+                                        📅 Կփակվի: {new Date(config.closing_time).toLocaleString('hy-AM', {
+                                            year: 'numeric',
+                                            month: 'long',
+                                            day: 'numeric',
+                                            hour: '2-digit',
+                                            minute: '2-digit'
+                                        })}
+                                    </p>
+                                )}
+                            </div>
+                            <div className="flex gap-2">
+                                <input
+                                    type="datetime-local"
+                                    value={config.closing_time ? (() => {
+                                        // Convert UTC to local time for display
+                                        const date = new Date(config.closing_time);
+                                        // Get local time in YYYY-MM-DDTHH:mm format
+                                        const year = date.getFullYear();
+                                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                                        const day = String(date.getDate()).padStart(2, '0');
+                                        const hours = String(date.getHours()).padStart(2, '0');
+                                        const minutes = String(date.getMinutes()).padStart(2, '0');
+                                        return `${year}-${month}-${day}T${hours}:${minutes}`;
+                                    })() : ''}
+                                    onChange={async (e) => {
+                                        if (!e.target.value) {
+                                            // Clear the closing time
+                                            const { error } = await supabase
+                                                .from('voting_config')
+                                                .update({ closing_time: null, updated_at: new Date().toISOString() })
+                                                .eq('id', 1)
+
+                                            if (error) {
+                                                toast.error('Սխալ')
+                                            } else {
+                                                setConfig({ ...config, closing_time: null })
+                                                toast.success('Փակման ժամանակը հեռացված է')
+                                            }
+                                            return;
+                                        }
+
+                                        // datetime-local gives us local time
+                                        const selectedDate = new Date(e.target.value);
+                                        const now = new Date();
+
+                                        // Validate: must be in the future (local time comparison)
+                                        if (selectedDate <= now) {
+                                            toast.error('Ամսաթիվը պետք է լինի ապագայում');
+                                            return;
+                                        }
+
+                                        // Convert to UTC for storage
+                                        const newTime = selectedDate.toISOString();
+
+                                        const { error } = await supabase
+                                            .from('voting_config')
+                                            .update({ closing_time: newTime, updated_at: new Date().toISOString() })
+                                            .eq('id', 1)
+
+                                        if (error) {
+                                            toast.error('Սխալ: ' + error.message)
+                                        } else {
+                                            setConfig({ ...config, closing_time: newTime })
+                                            toast.success('Փակման ժամանակը սահմանված է')
+                                        }
+                                    }}
+                                    className="px-3 py-2 border border-red-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+                                />
+                                {config.closing_time && (
+                                    <button
+                                        onClick={async () => {
+                                            const { error } = await supabase
+                                                .from('voting_config')
+                                                .update({ closing_time: null, updated_at: new Date().toISOString() })
+                                                .eq('id', 1)
+
+                                            if (error) {
+                                                toast.error('Սխալ')
+                                            } else {
+                                                setConfig({ ...config, closing_time: null })
+                                                toast.success('Փակման ժամանակը հեռացված է')
+                                            }
+                                        }}
+                                        style={{ backgroundColor: 'rgb(220 38 38 / 19%)', color: 'rgb(220 38 38)' }}
+                                        className="px-3 py-2 rounded-lg font-semibold transition-colors hover:opacity-80 text-sm"
+                                    >
+                                        Մաքրել
+                                    </button>
+                                )}
+                            </div>
                         </div>
 
                         {/* Change Password */}
