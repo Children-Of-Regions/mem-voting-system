@@ -721,7 +721,7 @@ export default function SinglePageAdmin() {
                 </div>
                 <div className="card bg-green-50 text-center">
                     <div className="text-sm text-fade-600">Քվեարկած</div>
-                    <div className="text-3xl font-semibold text-brand-700">{codeStats.used}</div>
+                    <div className="text-3xl font-semibold text-brand-500">{codeStats.used}</div>
                 </div>
                 <div className="card bg-yellow-50 text-center">
                     <div className="text-sm text-fade-600">Չքվեարկած</div>
@@ -776,7 +776,7 @@ export default function SinglePageAdmin() {
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-4">
                                 <div className="bg-green-50 p-2 rounded text-center">
                                     <div className="text-xs text-fade-600">Ուղարկված</div>
-                                    <div className="font-bold text-brand-700">{emailStats.sent}</div>
+                                    <div className="font-bold text-brand-500">{emailStats.sent}</div>
                                 </div>
                                 <div className="bg-orange-50 p-2 rounded text-center">
                                     <div className="text-xs text-fade-600">Սպասում է</div>
