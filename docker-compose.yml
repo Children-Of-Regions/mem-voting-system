@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  # Frontend - React Application
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: mem-voting-frontend
+    ports:
+      - "127.0.0.1:7392:80"  # Only accessible locally - use Nginx reverse proxy for external access
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - mem-network
+
+  # Backend - Node.js API Server
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: mem-voting-backend
+    # No external port exposure needed - only accessible via internal network
+    expose:
+      - "3000"  # Internal port for frontend container to access
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - SERVER_PORT=3000
+    restart: unless-stopped
+    networks:
+      - mem-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  mem-network:
+    driver: bridge

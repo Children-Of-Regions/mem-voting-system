@@ -1,0 +1,423 @@
+/* Fallback to Montserrat and Inter */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;900&family=Inter:wght@400;500;700;900&display=swap');
+
+/* MEM Design System - MontserratArm Font Faces */
+@font-face {
+  font-family: 'MontserratArm';
+  src: url('https://fonts.cdnfonts.com/s/93097/MontserratArm-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'MontserratArm';
+  src: url('https://fonts.cdnfonts.com/s/93097/MontserratArm-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'MontserratArm';
+  src: url('https://fonts.cdnfonts.com/s/93097/MontserratArm-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'MontserratArm';
+  src: url('https://fonts.cdnfonts.com/s/93097/MontserratArm-ExtraBold.woff') format('woff');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* MEM Design System - CSS Custom Properties */
+:root {
+  /* Brand Colors (Greens) */
+  --color-brand-50: #E1F4E2;
+  --color-brand-100: #BFE3C2;
+  --color-brand-200: #9DD2A2;
+  --color-brand-300: #ECFFED;
+  --color-brand-400: #59B061;
+  --color-brand-500: #379F41;
+  /* Main */
+  --color-brand-600: #2C7F34;
+  --color-brand-700: #215F27;
+
+  /* Accent Colors */
+  --color-accent-blue-dark: #4F01A3;
+  --color-accent-blue-light: #F7EFFF;
+  --color-accent-purple-dark: #A14BED;
+  --color-accent-purple-light: #F7F6FF;
+  --color-accent-coral-dark: #FC635C;
+  --color-accent-coral-light: #FFE7E5;
+  --color-accent-yellow-dark: #E9C501;
+  --color-accent-yellow-light: #FFFDF2;
+
+  /* Neutral / Grayscale (Fade) */
+  --color-fade-black: #000000;
+  --color-fade-800: #333333;
+  --color-fade-750: #404040;
+  --color-fade-700: #4D4D4D;
+  --color-fade-600: #666666;
+  --color-fade-500: #808080;
+  --color-fade-400: #999999;
+  --color-fade-250: #BFBFBF;
+  --color-fade-200: #CCCCCC;
+  --color-fade-100: #E5E5E5;
+  --color-fade-50: #F2F2F2;
+  --color-fade-white: #FFFFFF;
+
+  /* Functional Colors */
+  --color-error-dark: #EA2E36;
+  --color-error-light: #F26C72;
+  --color-helping-5: #F7FBF5;
+  --color-helping-150: #CEE4C0;
+  --color-helping-300: #A5CC8B;
+
+  /* Detail Colors */
+  --color-details-yellow: #FFFBE4;
+  --color-details-green1: #E2E9D0;
+  --color-details-green2: #BEDA78;
+  --color-details-orange: #F99375;
+  --color-details-green3: #79D997;
+  --color-details-blue: #C4D8FF;
+  --color-details-yellow2: #FFE13C;
+}
+
+/* Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'MontserratArm', 'Montserrat', 'Inter', sans-serif;
+  background-color: var(--color-fade-white);
+  color: var(--color-fade-800);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--color-fade-800);
+}
+
+h3 {
+  font-size: 40px;
+}
+
+h5 {
+  font-size: 22px;
+}
+
+h6 {
+  font-size: 18px;
+}
+
+/* MEM Button Components */
+.btn {
+  @apply px-6 py-3 rounded-pill font-medium transition-all duration-200 cursor-pointer;
+  @apply focus:outline-none focus:ring-2 focus:ring-offset-2;
+  font-size: 16px;
+}
+
+/* Header Donate Button Style */
+.btn-donate-header {
+  @apply bg-helping-150 text-brand-600 hover:bg-helping-300 hover:text-brand-700;
+  @apply focus:ring-brand-500;
+  padding: 10px 24px;
+  border-radius: 100px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+/* Footer Donate Button Style */
+.btn-donate-footer {
+  @apply bg-brand-500 text-fade-white hover:bg-helping-150 hover:text-brand-600;
+  @apply focus:ring-brand-500;
+  padding: 10px 24px;
+  border-radius: 100px;
+  font-weight: 500;
+}
+
+.btn-primary {
+  @apply bg-brand-500 text-fade-white hover:bg-brand-600;
+  @apply focus:ring-brand-500;
+}
+
+.btn-secondary {
+  @apply bg-brand-400 text-fade-white hover:bg-brand-500;
+  @apply focus:ring-brand-400;
+}
+
+.btn-outline {
+  @apply border-2 border-brand-500 text-brand-500 hover:bg-brand-500 hover:text-fade-white;
+  @apply focus:ring-brand-500;
+}
+
+.btn-danger {
+  @apply bg-error-dark/20 text-error-dark hover:bg-error-dark hover:text-fade-white;
+  @apply focus:ring-error-dark;
+}
+
+/* MEM Input Field Styles */
+.input-field {
+  @apply w-full px-4 py-3 border border-fade-200 rounded-lg;
+  @apply transition-all duration-200;
+  box-shadow: 0px 1px 2px 0px rgba(16, 24, 40, 0.05);
+  font-family: 'MontserratArm', 'Montserrat', 'Inter', sans-serif;
+}
+
+.input-field:focus {
+  @apply outline-none border-brand-500;
+  box-shadow: 0px 0px 0px 4px #F7FBF5;
+}
+
+.input-field.error {
+  @apply border-error-dark;
+  box-shadow: 0px 0px 0px 4px #FFEBE9;
+}
+
+/* Card Components */
+.card {
+  @apply bg-fade-white rounded-xl shadow-md p-6;
+  @apply transition-all duration-200;
+}
+
+.card-hover {
+  @apply hover:shadow-xl hover:scale-[1.02];
+}
+
+.nominee-card {
+  @apply card card-hover cursor-pointer border-2 border-transparent;
+  @apply transition-all duration-300;
+}
+
+.nominee-card.selected {
+  @apply border-brand-500 bg-helping-5;
+}
+
+/* Header Styles */
+.header {
+  @apply bg-fade-white;
+  box-shadow: 0px 2px 10px -2px rgba(16, 24, 40, 0.06);
+  padding: 8px 16px;
+}
+
+@media (min-width: 768px) {
+  .header {
+    padding: 8px 32px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .header {
+    padding: 8px 20px;
+  }
+}
+
+.nav-link {
+  @apply text-fade-800 hover:text-brand-400 transition-colors duration-200;
+  font-weight: 500;
+}
+
+.nav-link.active {
+  @apply text-brand-200;
+  border-bottom: 2px solid var(--color-brand-200);
+}
+
+/* Loading Spinner */
+.spinner {
+  @apply inline-block w-8 h-8 border-4 border-fade-200 border-t-brand-500 rounded-full;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Container */
+.container-custom {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+/* Page Transitions */
+.fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Admin Dashboard Layout */
+.admin-layout {
+  @apply min-h-screen bg-fade-50;
+}
+
+.admin-sidebar {
+  @apply bg-fade-white shadow-lg;
+}
+
+.admin-content {
+  @apply flex-1 p-8;
+}
+
+/* Table Styles */
+.table-container {
+  @apply overflow-x-auto bg-fade-white rounded-lg shadow;
+}
+
+.table {
+  @apply min-w-full divide-y divide-fade-200;
+}
+
+.table thead {
+  @apply bg-fade-50;
+}
+
+.table th {
+  @apply px-6 py-3 text-left text-xs font-bold text-fade-700 uppercase tracking-wider;
+}
+
+.table td {
+  @apply px-6 py-4 whitespace-nowrap text-sm text-fade-800;
+}
+
+.table tbody tr:hover {
+  @apply bg-helping-5;
+}
+
+/* Badge Styles */
+.badge {
+  @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
+}
+
+.badge-success {
+  @apply bg-helping-150 text-brand-700;
+}
+
+.badge-warning {
+  @apply bg-accent-yellow-light text-accent-yellow-dark;
+}
+
+.badge-danger {
+  @apply bg-accent-coral-light text-error-dark;
+}
+
+.badge-info {
+  @apply bg-accent-blue-light text-accent-blue-dark;
+}
+
+/* Dropdown Menu */
+.dropdown-menu {
+  @apply absolute right-0 mt-2 w-48 bg-fade-white rounded-lg shadow-lg border border-fade-200 py-1 z-50;
+}
+
+.dropdown-item {
+  @apply px-4 py-2 text-sm text-fade-700 hover:bg-fade-50 cursor-pointer flex items-center gap-2 transition-colors;
+}
+
+.dropdown-item:hover {
+  @apply bg-helping-5;
+}
+
+.dropdown-item.danger {
+  @apply text-error-dark;
+}
+
+.dropdown-item.danger:hover {
+  @apply bg-accent-coral-light text-error-dark;
+}
+
+/* Pagination */
+.pagination {
+  @apply flex items-center justify-center gap-2 mt-6;
+}
+
+.pagination-button {
+  @apply px-4 py-2 rounded-lg border border-fade-200 bg-fade-white text-fade-700 hover:bg-fade-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors;
+}
+
+.pagination-button.active {
+  @apply bg-brand-500 text-fade-white border-brand-500;
+}
+
+.pagination-info {
+  @apply text-sm text-fade-600 mx-4;
+}
+
+/* Three-dot menu button */
+.menu-button {
+  @apply p-2 rounded-lg hover:bg-fade-50 transition-colors cursor-pointer;
+}
+
+/* Collapsible section */
+.collapsible-section {
+  @apply overflow-hidden transition-all duration-300;
+}
+
+.collapsible-section.collapsed {
+  @apply max-h-0;
+}
+
+.collapsible-section.expanded {
+  @apply max-h-[1000px];
+}
+
+/* Footer Styles */
+.footer {
+  padding: 20px 16px;
+}
+
+@media (min-width: 768px) {
+  .footer {
+    padding: 40px 32px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .footer {
+    padding: 64px 60px;
+  }
+}
+
+.footer-label {
+  @apply text-fade-800 font-medium;
+}
+
+.footer-value,
+.footer-link {
+  @apply text-brand-400 hover:text-brand-500 transition-colors;
+}
+
+.footer-copyright {
+  @apply text-fade-400 text-sm;
+}
