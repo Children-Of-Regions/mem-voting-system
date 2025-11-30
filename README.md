@@ -307,7 +307,6 @@ docker-compose restart
 git pull origin main
 
 # Վերակառուցել և վերագործարկել
-docker-compose up -d --build
 ```
 
 ### Դիտել Լոգերը
