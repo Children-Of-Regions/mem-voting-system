@@ -4,7 +4,7 @@ import { generateUniqueCodes } from '../../utils/codeGenerator'
 import { updatePassword } from '../../utils/auth'
 import toast from 'react-hot-toast'
 import { api } from '../../services/api'
-import { POLLING_INTERVAL, MAX_DESCRIPTION_LENGTH, MIN_PASSWORD_LENGTH, MIN_CODE_COUNT, MAX_CODE_COUNT, DEFAULT_ITEMS_PER_PAGE, IMAGE_ASPECT_RATIO, IMAGE_ASPECT_RATIO_TOLERANCE } from '../../constants'
+import { POLLING_INTERVAL, MAX_DESCRIPTION_LENGTH, MAX_DETAILED_INFO_LENGTH, MIN_PASSWORD_LENGTH, MIN_CODE_COUNT, MAX_CODE_COUNT, DEFAULT_ITEMS_PER_PAGE, IMAGE_ASPECT_RATIO, IMAGE_ASPECT_RATIO_TOLERANCE } from '../../constants'
 import DropdownMenu from './DropdownMenu'
 import Pagination from './Pagination'
 import Modal from './Modal'
@@ -16,7 +16,7 @@ export default function SinglePageAdmin() {
     // Nominees state
     const [nominees, setNominees] = useState([])
     const [editingNominee, setEditingNominee] = useState(null)
-    const [newNominee, setNewNominee] = useState({ name: '', description: '', image_url: '', imageFile: null })
+    const [newNominee, setNewNominee] = useState({ name: '', description: '', detailed_info: '', image_url: '', imageFile: null })
     const [showAddModal, setShowAddModal] = useState(false)
     const [showEditModal, setShowEditModal] = useState(false)
 
@@ -401,6 +401,11 @@ export default function SinglePageAdmin() {
             return
         }
 
+        if (newNominee.detailed_info && newNominee.detailed_info.length > MAX_DETAILED_INFO_LENGTH) {
+            toast.error(`Մանրամասն տեղեկությունը չպետք է գերազանցի ${MAX_DETAILED_INFO_LENGTH} նիշը`)
+            return
+        }
+
         let finalImageUrl = newNominee.image_url
 
         // Upload image if a new file was selected
@@ -415,6 +420,7 @@ export default function SinglePageAdmin() {
                 config_id: 1,
                 name: newNominee.name.trim(),
                 description: newNominee.description.trim(),
+                detailed_info: newNominee.detailed_info?.trim() || null,
                 image_url: finalImageUrl,
                 vote_count: 0
             }])
@@ -424,7 +430,7 @@ export default function SinglePageAdmin() {
             console.error(error)
         } else {
             toast.success('Թեկնածուն ավելացված է')
-            setNewNominee({ name: '', description: '', image_url: '', imageFile: null })
+            setNewNominee({ name: '', description: '', detailed_info: '', image_url: '', imageFile: null })
             setShowAddModal(false)
             fetchAllData()
         }
@@ -446,6 +452,11 @@ export default function SinglePageAdmin() {
             return
         }
 
+        if (editingNominee.detailed_info && editingNominee.detailed_info.length > MAX_DETAILED_INFO_LENGTH) {
+            toast.error(`Մանրամասն տեղեկությունը չպետք է գերազանցի ${MAX_DETAILED_INFO_LENGTH} նիշը`)
+            return
+        }
+
         let finalImageUrl = editingNominee.image_url
 
         // Upload image if a new file was selected
@@ -459,6 +470,7 @@ export default function SinglePageAdmin() {
             .update({
                 name: editingNominee.name.trim(),
                 description: editingNominee.description.trim(),
+                detailed_info: editingNominee.detailed_info?.trim() || null,
                 image_url: finalImageUrl
             })
             .eq('id', id)
@@ -695,7 +707,7 @@ export default function SinglePageAdmin() {
                                             {nominee.name}
                                         </h3>
                                         {nominee.description && (
-                                            <p className="text-sm text-fade-600">{nominee.description}</p>
+                                            <p className="text-sm text-fade-600 whitespace-pre-line">{nominee.description}</p>
                                         )}
 
                                         {/* Vote Stats */}
@@ -1195,7 +1207,7 @@ export default function SinglePageAdmin() {
                 isOpen={showAddModal}
                 onClose={() => {
                     setShowAddModal(false)
-                    setNewNominee({ name: '', description: '', image_url: '' })
+                    setNewNominee({ name: '', description: '', detailed_info: '', image_url: '', imageFile: null })
                 }}
                 title="Ավելացնել Թեկնածու"
             >
@@ -1222,6 +1234,20 @@ export default function SinglePageAdmin() {
                         />
                         <div className="text-right text-xs text-fade-500 mt-1">
                             {newNominee.description.length}/150
+                        </div>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-fade-700 mb-1">Մանրամասն տեղեկություն (ոչ պարտադիր)</label>
+                        <textarea
+                            value={newNominee.detailed_info}
+                            onChange={(e) => setNewNominee({ ...newNominee, detailed_info: e.target.value })}
+                            className="input-field"
+                            rows="6"
+                            placeholder="Մինչև 1000 նիշ - Կցուցադրվի մոդալ պատուհանում"
+                            maxLength={1000}
+                        />
+                        <div className="text-right text-xs text-fade-500 mt-1">
+                            {newNominee.detailed_info?.length || 0}/1000
                         </div>
                     </div>
                     <div>
@@ -1280,7 +1306,7 @@ export default function SinglePageAdmin() {
                         <button
                             onClick={() => {
                                 setShowAddModal(false)
-                                setNewNominee({ name: '', description: '', image_url: '' })
+                                setNewNominee({ name: '', description: '', detailed_info: '', image_url: '', imageFile: null })
                             }}
                             className="btn btn-outline flex-1"
                             disabled={uploading}
@@ -1328,6 +1354,20 @@ export default function SinglePageAdmin() {
                             />
                             <div className="text-right text-xs text-fade-500 mt-1">
                                 {editingNominee.description.length}/150
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-fade-700 mb-1">Մանրամասն տեղեկություն (ոչ պարտադիր)</label>
+                            <textarea
+                                value={editingNominee.detailed_info || ''}
+                                onChange={(e) => setEditingNominee({ ...editingNominee, detailed_info: e.target.value })}
+                                className="input-field"
+                                rows="6"
+                                placeholder="Մինչև 1000 նիշ - Կցուցադրվի մոդալ պատուհանում"
+                                maxLength={1000}
+                            />
+                            <div className="text-right text-xs text-fade-500 mt-1">
+                                {editingNominee.detailed_info?.length || 0}/1000
                             </div>
                         </div>
                         <div>

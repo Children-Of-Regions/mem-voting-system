@@ -36,6 +36,7 @@ CREATE TABLE nominees (
     config_id INTEGER REFERENCES voting_config(id) DEFAULT 1,
     name TEXT NOT NULL,
     description TEXT,
+    detailed_info TEXT,
     image_url TEXT,
     vote_count INTEGER DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
@@ -279,3 +280,7 @@ $$;
 -- Voting is automatically closed when results are published (enforced by trigger)
 -- Voting can be scheduled to close at a specific time (closing_time field)
 -- Call auto_close_voting_by_time() periodically to check and close voting
+-- 
+-- Nominees table includes:
+--   - description: Short text (max 150 chars) shown on cards
+--   - detailed_info: Extended text (max 1000 chars) shown in modal popup

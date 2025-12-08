@@ -18,6 +18,8 @@ export default function VotingPage() {
     const [showModal, setShowModal] = useState(false)
     const [modalMessage, setModalMessage] = useState('')
     const [modalType, setModalType] = useState('success') // 'success' or 'error'
+    const [showDetailModal, setShowDetailModal] = useState(false)
+    const [selectedNomineeDetail, setSelectedNomineeDetail] = useState(null)
 
     // Check for active session and results on mount
     useEffect(() => {
@@ -263,7 +265,7 @@ export default function VotingPage() {
                             return (
                                 <div
                                     key={nominee.id}
-                                    className={`nominee-card w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] relative overflow-hidden cursor-default hover:shadow-lg transition-all duration-300 border-4 border-yellow-400 ${isWinner ? 'shadow-xl transform scale-[1.02] ring-2 ring-yellow-400 ring-offset-2' : ''
+                                    className={`nominee-card w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] relative overflow-hidden cursor-default hover:shadow-lg transition-all duration-300 border-4 border-yellow-400 flex flex-col ${isWinner ? 'shadow-xl transform scale-[1.02] ring-2 ring-yellow-400 ring-offset-2' : ''
                                         }`}
                                 >
                                     {/* Rank Badge */}
@@ -284,25 +286,39 @@ export default function VotingPage() {
                                         </div>
                                     )}
 
-                                    <h3 className="text-2xl font-semibold text-brand-500 mb-2">
-                                        {nominee.name}
-                                    </h3>
-                                    {nominee.description && (
-                                        <p className="text-gray-600 text-sm mb-4">{nominee.description}</p>
-                                    )}
+                                    <div className="flex flex-col flex-grow">
+                                        <h3 className="text-2xl font-semibold text-brand-500 mb-2">
+                                            {nominee.name}
+                                        </h3>
+                                        {nominee.description && (
+                                            <p className="text-gray-600 text-sm mb-3 whitespace-pre-line">{nominee.description}</p>
+                                        )}
 
-                                    <div className="mt-auto">
-                                        <div className="flex justify-between items-end mb-2">
-                                            <div className="text-3xl font-bold text-text-dark">
-                                                {nominee.vote_count}
+                                        <div className="mt-auto">
+                                            {nominee.detailed_info && (
+                                                <button
+                                                    onClick={() => {
+                                                        setSelectedNomineeDetail(nominee)
+                                                        setShowDetailModal(true)
+                                                    }}
+                                                    className="mb-3 text-brand-500 hover:text-brand-600 text-sm font-medium underline"
+                                                >
+                                                    Տեսնել ավելին →
+                                                </button>
+                                            )}
+
+                                            <div className="flex justify-between items-end mb-2">
+                                                <div className="text-3xl font-bold text-text-dark">
+                                                    {nominee.vote_count}
+                                                </div>
+                                                <div className="text-lg font-medium text-gray-500">{percentage}%</div>
                                             </div>
-                                            <div className="text-lg font-medium text-gray-500">{percentage}%</div>
-                                        </div>
-                                        <div className="w-full bg-gray-200 rounded-full h-3">
-                                            <div
-                                                className="bg-brand-500 h-3 rounded-full transition-all duration-500"
-                                                style={{ width: `${percentage}%` }}
-                                            />
+                                            <div className="w-full bg-gray-200 rounded-full h-3">
+                                                <div
+                                                    className="bg-brand-500 h-3 rounded-full transition-all duration-500"
+                                                    style={{ width: `${percentage}%` }}
+                                                />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -453,7 +469,7 @@ export default function VotingPage() {
                         <div
                             key={nominee.id}
                             onClick={() => setSelectedNominee(nominee.id)}
-                            className={`nominee-card w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] ${selectedNominee === nominee.id ? 'selected' : ''}`}
+                            className={`nominee-card w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] flex flex-col ${selectedNominee === nominee.id ? 'selected' : ''}`}
                         >
                             {nominee.image_url && (
                                 <div className="w-full aspect-square rounded-lg overflow-hidden bg-gray-100 mb-4">
@@ -465,19 +481,36 @@ export default function VotingPage() {
                                     />
                                 </div>
                             )}
-                            <h3 className="text-2xl font-semibold text-brand-500 mb-2">
-                                {nominee.name}
-                            </h3>
-                            {nominee.description && (
-                                <p className="text-gray-600 text-sm">{nominee.description}</p>
-                            )}
-                            {selectedNominee === nominee.id && (
-                                <div className="mt-4 flex items-center justify-center">
-                                    <svg className="w-6 h-6 text-brand-500" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                    </svg>
+                            <div className="flex flex-col flex-grow">
+                                <h3 className="text-2xl font-semibold text-brand-500 mb-2">
+                                    {nominee.name}
+                                </h3>
+                                {nominee.description && (
+                                    <p className="text-gray-600 text-sm whitespace-pre-line mb-3">{nominee.description}</p>
+                                )}
+
+                                <div className="mt-auto">
+                                    {nominee.detailed_info && (
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation()
+                                                setSelectedNomineeDetail(nominee)
+                                                setShowDetailModal(true)
+                                            }}
+                                            className="text-brand-500 hover:text-brand-600 text-sm font-medium underline mb-3"
+                                        >
+                                            Տեսնել ավելին →
+                                        </button>
+                                    )}
+                                    {selectedNominee === nominee.id && (
+                                        <div className="flex items-center justify-center">
+                                            <svg className="w-6 h-6 text-brand-500" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                            </svg>
+                                        </div>
+                                    )}
                                 </div>
-                            )}
+                            </div>
                         </div>
                     ))}
                 </div>
@@ -525,6 +558,62 @@ export default function VotingPage() {
                         >
                             Լավ
                         </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Detailed Info Modal */}
+            {showDetailModal && selectedNomineeDetail && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50" onClick={() => setShowDetailModal(false)}>
+                    <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto animate-fade-in" onClick={(e) => e.stopPropagation()}>
+                        {/* Content Section */}
+                        <div className="p-6 md:p-8">
+                            <div className="flex flex-col md:flex-row gap-6">
+                                {/* Image - floated left on desktop */}
+                                {selectedNomineeDetail.image_url && (
+                                    <div className="w-full md:w-1/3 flex-shrink-0">
+                                        <img
+                                            src={selectedNomineeDetail.image_url}
+                                            alt={selectedNomineeDetail.name}
+                                            className="w-full h-auto object-contain rounded-lg"
+                                            onError={(e) => e.target.style.display = 'none'}
+                                        />
+                                    </div>
+                                )}
+
+                                {/* Text content - flows next to and below image */}
+                                <div className="flex-1">
+                                    <h2 className="text-3xl font-bold text-brand-500 mb-3">
+                                        {selectedNomineeDetail.name}
+                                    </h2>
+
+                                    {selectedNomineeDetail.description && (
+                                        <p className="text-gray-600 text-base italic whitespace-pre-line mb-4">
+                                            {selectedNomineeDetail.description}
+                                        </p>
+                                    )}
+
+                                    {selectedNomineeDetail.detailed_info && (
+                                        <div className="pt-4 border-t border-gray-200">
+                                            <p className="text-gray-700 text-base leading-relaxed whitespace-pre-line">
+                                                {selectedNomineeDetail.detailed_info}
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+
+                        {/* Close Button */}
+                        <div className="px-6 md:px-8 pb-6 md:pb-8">
+                            <button
+                                onClick={() => setShowDetailModal(false)}
+                                className="btn btn-primary w-full"
+                            >
+                                Փակել
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
