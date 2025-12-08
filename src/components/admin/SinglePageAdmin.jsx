@@ -401,7 +401,12 @@ export default function SinglePageAdmin() {
             return
         }
 
-        if (newNominee.detailed_info && newNominee.detailed_info.length > MAX_DETAILED_INFO_LENGTH) {
+        if (!newNominee.detailed_info || !newNominee.detailed_info.trim()) {
+            toast.error('Մանրամասն տեղեկությունը պարտադիր է')
+            return
+        }
+
+        if (newNominee.detailed_info.length > MAX_DETAILED_INFO_LENGTH) {
             toast.error(`Մանրամասն տեղեկությունը չպետք է գերազանցի ${MAX_DETAILED_INFO_LENGTH} նիշը`)
             return
         }
@@ -452,7 +457,12 @@ export default function SinglePageAdmin() {
             return
         }
 
-        if (editingNominee.detailed_info && editingNominee.detailed_info.length > MAX_DETAILED_INFO_LENGTH) {
+        if (!editingNominee.detailed_info || !editingNominee.detailed_info.trim()) {
+            toast.error('Մանրամասն տեղեկությունը պարտադիր է')
+            return
+        }
+
+        if (editingNominee.detailed_info.length > MAX_DETAILED_INFO_LENGTH) {
             toast.error(`Մանրամասն տեղեկությունը չպետք է գերազանցի ${MAX_DETAILED_INFO_LENGTH} նիշը`)
             return
         }
@@ -1237,7 +1247,7 @@ export default function SinglePageAdmin() {
                         </div>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-fade-700 mb-1">Մանրամասն տեղեկություն (ոչ պարտադիր)</label>
+                        <label className="block text-sm font-medium text-fade-700 mb-1">Մանրամասն տեղեկություն</label>
                         <textarea
                             value={newNominee.detailed_info}
                             onChange={(e) => setNewNominee({ ...newNominee, detailed_info: e.target.value })}
@@ -1357,7 +1367,7 @@ export default function SinglePageAdmin() {
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-fade-700 mb-1">Մանրամասն տեղեկություն (ոչ պարտադիր)</label>
+                            <label className="block text-sm font-medium text-fade-700 mb-1">Մանրամասն տեղեկություն</label>
                             <textarea
                                 value={editingNominee.detailed_info || ''}
                                 onChange={(e) => setEditingNominee({ ...editingNominee, detailed_info: e.target.value })}
