@@ -8,7 +8,7 @@ export const EMAIL_BATCH_SIZE = 50
 export const EMAIL_RATE_LIMIT_MS = 500 // Delay between emails
 
 // Validation limits
-export const MAX_DESCRIPTION_LENGTH = 100
+export const MAX_DESCRIPTION_LENGTH = 150
 export const MIN_PASSWORD_LENGTH = 6
 export const MIN_CODE_COUNT = 1
 export const MAX_CODE_COUNT = 1000

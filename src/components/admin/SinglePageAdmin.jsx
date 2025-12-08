@@ -1217,11 +1217,11 @@ export default function SinglePageAdmin() {
                             onChange={(e) => setNewNominee({ ...newNominee, description: e.target.value })}
                             className="input-field"
                             rows="3"
-                            placeholder="Մինչև 100 նիշ"
-                            maxLength={100}
+                            placeholder="Մինչև 150 նիշ"
+                            maxLength={150}
                         />
                         <div className="text-right text-xs text-fade-500 mt-1">
-                            {newNominee.description.length}/100
+                            {newNominee.description.length}/150
                         </div>
                     </div>
                     <div>
@@ -1324,10 +1324,10 @@ export default function SinglePageAdmin() {
                                 onChange={(e) => setEditingNominee({ ...editingNominee, description: e.target.value })}
                                 className="input-field"
                                 rows="3"
-                                maxLength={100}
+                                maxLength={150}
                             />
                             <div className="text-right text-xs text-fade-500 mt-1">
-                                {editingNominee.description.length}/100
+                                {editingNominee.description.length}/150
                             </div>
                         </div>
                         <div>
