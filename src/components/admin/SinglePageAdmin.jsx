@@ -144,6 +144,8 @@ export default function SinglePageAdmin() {
                 return
             }
 
+            toast.info(`Գտնվել է ${emails.length} էլ․ հասցե, մշակում...`)
+
             // Validate email format
             const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
             const validEmails = []
@@ -170,77 +172,88 @@ export default function SinglePageAdmin() {
             let insertedCount = 0
             let failedCount = 0
 
-            // 1. Insert new valid emails with status 'pending'
+            // Helper function to generate code
+            const generateCode = () => {
+                const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+                let code = ''
+                for (let i = 0; i < 6; i++) {
+                    if (i === 3) code += '-'
+                    code += chars.charAt(Math.floor(Math.random() * chars.length))
+                }
+                return code
+            }
+
+            // 1. Insert new valid emails in batches of 50
             if (newEmails.length > 0) {
-                const codesToInsert = newEmails.map(email => {
-                    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
-                    let code = ''
-                    for (let i = 0; i < 6; i++) {
-                        if (i === 3) code += '-'
-                        code += chars.charAt(Math.floor(Math.random() * chars.length))
-                    }
-                    return {
+                const BATCH_SIZE = 50
+                for (let i = 0; i < newEmails.length; i += BATCH_SIZE) {
+                    const batch = newEmails.slice(i, i + BATCH_SIZE)
+                    const codesToInsert = batch.map(email => ({
                         email,
-                        code,
+                        code: generateCode(),
                         email_status: 'pending',
                         is_used: false,
                         created_at: new Date().toISOString()
+                    }))
+
+                    const { error: insertError } = await supabase
+                        .from('voting_codes')
+                        .insert(codesToInsert)
+
+                    if (insertError) {
+                        console.error('Batch insert error:', insertError)
+                        throw insertError
                     }
-                })
+                    insertedCount += batch.length
 
-                const { error: insertError } = await supabase
-                    .from('voting_codes')
-                    .insert(codesToInsert)
-
-                if (insertError) {
-                    throw insertError
+                    // Show progress
+                    if (newEmails.length > BATCH_SIZE) {
+                        toast.info(`Ավելացվել է ${insertedCount}/${newEmails.length}...`, { duration: 1000 })
+                    }
                 }
-                insertedCount = newEmails.length
             }
 
-            // 2. Mark duplicate emails as 'failed' so they appear in failed list
+            // 2. Mark duplicate emails as 'failed' in batches
             if (duplicateEmails.length > 0) {
-                const { error: updateError } = await supabase
-                    .from('voting_codes')
-                    .update({
-                        email_status: 'failed',
-                        email_error: 'Էլ․ հասցեն արդեն գոյություն ունի տվյալների բազայում'
-                    })
-                    .in('email', duplicateEmails)
+                const BATCH_SIZE = 50
+                for (let i = 0; i < duplicateEmails.length; i += BATCH_SIZE) {
+                    const batch = duplicateEmails.slice(i, i + BATCH_SIZE)
+                    const { error: updateError } = await supabase
+                        .from('voting_codes')
+                        .update({
+                            email_status: 'failed',
+                            email_error: 'Էլ․ հասցեն արդեն գոյություն ունի տվյալների բազայում'
+                        })
+                        .in('email', batch)
 
-                if (updateError) {
-                    throw updateError
+                    if (updateError) {
+                        console.error('Batch update error:', updateError)
+                    }
                 }
                 failedCount += duplicateEmails.length
             }
 
-            // 3. Insert invalid emails with status 'failed'
+            // 3. Insert invalid emails with status 'failed' in batches
             if (invalidEmails.length > 0) {
-                const invalidCodesToInsert = invalidEmails.map(email => {
-                    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
-                    let code = ''
-                    for (let i = 0; i < 6; i++) {
-                        if (i === 3) code += '-'
-                        code += chars.charAt(Math.floor(Math.random() * chars.length))
-                    }
-                    return {
+                const BATCH_SIZE = 50
+                for (let i = 0; i < invalidEmails.length; i += BATCH_SIZE) {
+                    const batch = invalidEmails.slice(i, i + BATCH_SIZE)
+                    const invalidCodesToInsert = batch.map(email => ({
                         email,
-                        code,
+                        code: generateCode(),
                         email_status: 'failed',
                         email_error: 'Անվավեր էլ․ հասցեի ֆորմատ',
                         is_used: false,
                         created_at: new Date().toISOString()
+                    }))
+
+                    const { error: invalidInsertError } = await supabase
+                        .from('voting_codes')
+                        .insert(invalidCodesToInsert)
+
+                    if (invalidInsertError) {
+                        console.error('Invalid email insert error:', invalidInsertError)
                     }
-                })
-
-                const { error: invalidInsertError } = await supabase
-                    .from('voting_codes')
-                    .insert(invalidCodesToInsert)
-                    .select()
-
-                if (invalidInsertError) {
-                    // If insert fails (e.g., duplicate), just log it
-                    console.error('Invalid email insert error:', invalidInsertError)
                 }
                 failedCount += invalidEmails.length
             }
@@ -249,7 +262,7 @@ export default function SinglePageAdmin() {
             if (insertedCount > 0) messages.push(`${insertedCount} նոր էլ․ հասցե ավելացվեց հերթում`)
             if (failedCount > 0) messages.push(`${failedCount} էլ․ հասցե ավելացվեց ձախողված ցուցակում`)
 
-            toast.success(messages.join(', '))
+            toast.success(messages.join(', '), { duration: 5000 })
             setEmailFile(null)
             document.getElementById('email-file-input').value = ''
             await fetchCodes() // Refresh to show failed emails
