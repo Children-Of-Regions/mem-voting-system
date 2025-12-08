@@ -144,7 +144,7 @@ export default function SinglePageAdmin() {
                 return
             }
 
-            toast.info(`Գտնվել է ${emails.length} էլ․ հասցե, մշակում...`)
+            toast(`Գտնվել է ${emails.length} էլ․ հասցե, մշակում...`, { icon: '📧' })
 
             // Validate email format
             const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
@@ -208,7 +208,7 @@ export default function SinglePageAdmin() {
 
                     // Show progress
                     if (newEmails.length > BATCH_SIZE) {
-                        toast.info(`Ավելացվել է ${insertedCount}/${newEmails.length}...`, { duration: 1000 })
+                        toast(`Ավելացվել է ${insertedCount}/${newEmails.length}...`, { duration: 1000, icon: '⏳' })
                     }
                 }
             }
