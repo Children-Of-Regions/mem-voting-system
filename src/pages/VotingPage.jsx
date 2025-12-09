@@ -20,9 +20,14 @@ export default function VotingPage() {
     const [modalType, setModalType] = useState('success') // 'success' or 'error'
     const [showDetailModal, setShowDetailModal] = useState(false)
     const [selectedNomineeDetail, setSelectedNomineeDetail] = useState(null)
+    const [hasVoted, setHasVoted] = useState(false)
 
     // Check for active session and results on mount
     useEffect(() => {
+        // Clear the "has voted" flag on page load/reload
+        // This ensures code entry window shows after reload
+        sessionStorage.removeItem('hasVoted')
+
         checkActiveSession()
 
         // Check if code is in URL parameter
@@ -196,17 +201,26 @@ export default function VotingPage() {
             }
 
             if (data.success) {
+                // Remove ?code=xxx from URL
+                const url = new URL(window.location.href)
+                url.searchParams.delete('code')
+                window.history.replaceState({}, '', url.pathname + url.search)
+
+                // Mark as voted in session storage
+                sessionStorage.setItem('hasVoted', 'true')
+                setHasVoted(true)
+
+                // Hide the nominee cards by resetting codeValidated
+                setCodeValidated(false)
+
                 setModalMessage(data.message)
                 setModalType('success')
                 setShowModal(true)
-                // Reset state after modal is closed
+
+                // Keep success message visible for 5 seconds
                 setTimeout(() => {
-                    setCode('')
-                    setCodeValidated(false)
-                    setSelectedNominee(null)
-                    setNominees([])
-                    setSession(null)
-                }, 3000)
+                    setShowModal(false)
+                }, 5000)
             } else {
                 setModalMessage(data.error)
                 setModalType('error')
@@ -335,6 +349,33 @@ export default function VotingPage() {
     }
 
     if (!codeValidated) {
+        // If user has already voted (but hasn't reloaded), show "already voted" message
+        if (hasVoted) {
+            return (
+                <div className="min-h-screen bg-gray-50 flex items-start justify-center px-4 pt-40">
+                    <Toaster position="top-center" />
+                    <div className="max-w-xl w-full fade-in">
+                        <div className="text-center mb-8">
+                            <img
+                                src="/header-logo.png"
+                                alt="Logo"
+                                className="mx-auto w-64 sm:w-72 md:w-80 lg:w-96 h-auto"
+                            />
+                        </div>
+
+                        <div className="card text-center">
+                            <div className="space-y-4">
+                                <h2 className="text-2xl font-semibold text-brand-500">Շնորհակալություն քվեարկության համար!</h2>
+                                <p className="text-gray-700 text-lg">
+                                    Դու արդեն քվեարկել եք և կարիք չկա որևէ կոդ մուտքագրել։
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )
+        }
+
         return (
             <div className="min-h-screen bg-gray-50 flex items-start justify-center px-4 pt-40">
                 <Toaster position="top-center" />
